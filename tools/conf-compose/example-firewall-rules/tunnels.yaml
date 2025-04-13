@@ -1,3 +1,5 @@
+# Though it's `clients: any`, we don't add specific rules to each
+# client in `clients.yaml`.
 server.to_node1_and_node2.fault-tolerant.tunnels:
   tcp_tunnel_id: 1011
   udp_tunnel_id: 1012
@@ -28,7 +30,7 @@ server.to_node3_and_node4.fault-tolerant.tunnels:
     - node: client.node4
       destination_endpoint: 127.0.0.1:8304
 
-server.node1_to_node2.explicit.tunnels:
+server.node1_to_node2.tunnels:
   udp_tunnel_id: 2012
   entrances:
     - node: server.node1
@@ -36,20 +38,34 @@ server.node1_to_node2.explicit.tunnels:
   forwards:
     - node: server.node2
       destination_endpoint: 127.0.0.1:8302
-      explicit: true
   clients:
     - home_devices
     - school_devices
 
-server.node2_to_node1.non-explicit.tunnels:
+server.node2_to_node1.tunnels:
   tcp_tunnel_id: 3011
   entrances:
     - node: server.node2
       listen_endpoint: 0.0.0.0:3010
-      explicit: true
   forwards:
     - node: server.node1
       destination_endpoint: 127.0.0.1:8301
+      explicit: false
+  clients:
+    - home_devices
+    - school_devices
+
+server.node3_to_others.non-explicit.tunnels:
+  tcp_tunnel_id: 4011
+  entrances:
+    - node: client.node3
+      listen_endpoint: 0.0.0.0:4010
+      explicit: false
+  forwards:
+    - node: server.node1
+      destination_endpoint: 127.0.0.1:8401
+    - node: server.node2
+      destination_endpoint: 127.0.0.1:8402
   clients:
     - home_devices
     - school_devices

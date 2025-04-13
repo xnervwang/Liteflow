@@ -27,6 +27,9 @@
 ```
 
 例如，提供的example会生这样的图形：
+```
+./draw-graphviz.py -n example-regular/nodes.yaml -t example-regular/tunnels.yaml -d example-regular/output/liteflow.dot -i example-regular/output/liteflow.png
+```
 ![liteflow.png](./example-regular/output/liteflow.png)
 
 ## 生成防火墙规则
@@ -37,9 +40,7 @@
 ./generate-firewall-rules.py -n example-firewall-rules/nodes.yaml -t example-firewall-rules/tunnels.yaml -c example-firewall-rules/clients.yaml example-firewall-rules/output
 ```
 
-## 容灾备份（TODO）
-⚠️ 目前本工具暂时不支持产生容灾备份的配置，在将来的更新中将会提供。
-
+## 高级进阶：容灾备份
 在liteflow的设置中，`entrance_rule`可以显式指定tunnel另一端的节点的`node_id`，则此规则仅用于转发到该指定下一级节点。例如：
 ```json
 {
@@ -61,4 +62,6 @@
 
 在conf-compose的设置中，这可以通过在一个规则下设置多个`entrance`或`forward`来实现，请参考example。
 
-~~同一个规则下，如果只有单个`forward`，则其`entrance`可以设置`explicit`为`true`（默认为`false`），生成的`entrance_rule`中会严格指定`forward`节点的`node_id`。同样地，如果只有单个`entrance`，则其`forward`可以设置`explict`为`true`，生成的`forward_rule`中会严格指定`entrance`节点的`node_id`。~~
+同一个规则下，如果多于一个`forward`，则其`entrance`可以设置`explicit`为`false`（默认为`true`），生成的`entrance_rule`中就不会设置`forward`节点的`node_id`。
+
+相对应的时，如果只有单个`entrance`，则其`forward`可以设置`explict`为`true`（默认为`false`)，生成的`forward_rule`中会严格指定`entrance`节点的`node_id`。

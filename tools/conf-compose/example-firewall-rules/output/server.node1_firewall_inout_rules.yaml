@@ -1,4 +1,4 @@
-inbound/from_clients/server.node1_to_node2.explicit.tunnels/home_devices:
+inbound/from_clients/server.node1_to_node2.tunnels/home_devices:
   destination_endpoints:
   - 10.0.0.1:2010
   - 10.0.0.2:2010
@@ -7,7 +7,7 @@ inbound/from_clients/server.node1_to_node2.explicit.tunnels/home_devices:
   source_ips:
   - 50.35.0.0/16
   - 50.36.1.80
-inbound/from_clients/server.node1_to_node2.explicit.tunnels/school_devices:
+inbound/from_clients/server.node1_to_node2.tunnels/school_devices:
   destination_endpoints:
   - 10.0.0.1:2010
   - 10.0.0.2:2010

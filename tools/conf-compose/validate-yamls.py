@@ -127,6 +127,86 @@ def validate_nodes_yaml(nodes_data):
 
     return None
 
+def build_bidirectional_peer_map(nodes_data):
+    """
+    Build a bidirectional peer map from nodes.yaml.
+    Ensures that if A -> B in connect_peers, then B -> A is also included.
+    Returns: dict[node_name] = set of peer node names
+    """
+    peer_map = defaultdict(set)
+
+    for node_name, node_data in nodes_data.items():
+        peers = node_data.get("service", {}).get("connect_peers", [])
+        for peer in peers:
+            peer_map[node_name].add(peer)
+            peer_map[peer].add(node_name)  # reverse link
+
+    return peer_map
+
+def validate_explicit_false_peers_support_tunnel_ids(tunnels_data, nodes_data):
+    """
+    When an entrance rule has explicit=False, all its peers must also support
+    the same tcp_tunnel_id and/or udp_tunnel_id, otherwise random forwarding
+    may hit an unsupported peer.
+
+    This function builds:
+    1. peer_map: node_name -> set of peers (from nodes.yaml)
+    2. node_tunnel_ids: node_name -> set of supported tunnel_ids (from tunnels.yaml)
+    Then checks each entrance with explicit=False against its peers' support.
+    """
+    peer_map = build_bidirectional_peer_map(nodes_data)
+    print(peer_map)
+
+    # Build a map of node -> tunnel_ids it participates in
+    node_tunnel_ids = defaultdict(lambda: {"tcp": set(), "udp": set()})
+    for section in tunnels_data.values():
+        tid = section.get("tcp_tunnel_id")
+        uid = section.get("udp_tunnel_id")
+        for ent in section.get("entrances", []):
+            node_tunnel_ids[ent["node"]]["tcp"].add(tid)
+            node_tunnel_ids[ent["node"]]["udp"].add(uid)
+        for fwd in section.get("forwards", []):
+            node_tunnel_ids[fwd["node"]]["tcp"].add(tid)
+            node_tunnel_ids[fwd["node"]]["udp"].add(uid)
+
+    # Now validate each entrance with explicit=False
+    for section_name, section in tunnels_data.items():
+        tid = section.get("tcp_tunnel_id")
+        uid = section.get("udp_tunnel_id")
+
+        for entrance in section.get("entrances", []):
+            node_name = entrance["node"]
+            print(entrance)
+            explicit = entrance.get("explicit", True)
+            if explicit is True:
+                continue  # only validate when explicit is false
+
+            print(f"{node_name} is explicit")
+            peers = peer_map.get(node_name, set())
+            for peer in peers:
+                if peer not in node_tunnel_ids:
+                    return f"Peer node {peer} (peer of {node_name}) is not used in any tunnel and cannot receive traffic from {section_name}"
+
+                if tid is not None and tid not in node_tunnel_ids[peer]["tcp"]:
+                    return f"Peer node {peer} (peer of {node_name}) does not support tcp_tunnel_id {tid} required by {section_name} (explicit=false)"
+                if uid is not None and uid not in node_tunnel_ids[peer]["udp"]:
+                    return f"Peer node {peer} (peer of {node_name}) does not support udp_tunnel_id {uid} required by {section_name} (explicit=false)"
+
+    return None
+
+def validate_entrance_nodes_have_domain(tunnels_data, nodes_data):
+    """
+    Ensures that every node listed in entrances of tunnels.yaml
+    has a 'domain' field defined in nodes.yaml.
+    """
+    for section_name, section in tunnels_data.items():
+        for entrance in section.get("entrances", []):
+            node = entrance["node"]
+            node_entry = nodes_data.get(node, {})
+            if "domain" not in node_entry:
+                return f"Node '{node}' used in entrances of '{section_name}' is missing required 'domain' in nodes.yaml"
+    return None
+
 # Validate tunnels.yaml additional constraints
 def validate_tunnels_yaml(tunnels_data, nodes_data, clients_data):
     """
@@ -139,6 +219,11 @@ def validate_tunnels_yaml(tunnels_data, nodes_data, clients_data):
     6. Each entrance-forward node pair must have a valid connection in nodes.yaml.
     7. If clients.yaml is provided, every tunnel section should have "clients" key.
     8. If clients is an array, each element must be a valid key in clients_data.
+    9. If explicit is false, all peers of every entrance node in the entrance rule
+        must support this tcp_tunnel_id and/or udp_tunnel_id.
+    10. Though schema-nodes.json has verified a node should define domain if it has
+        defined listen_endpoint, here we still need to verify every entrance node
+        should also have defined domain.
     """
     tunnel_ids = set()
     listen_endpoints = defaultdict(set)
@@ -201,6 +286,15 @@ def validate_tunnels_yaml(tunnels_data, nodes_data, clients_data):
                 for client in clients:
                     if client not in all_clients_keys:
                         return f"Client {client} in {section_name} does not exist in clients.yaml"
+
+    # Validate explicit=false tunnel compatibility
+    errmsg = validate_explicit_false_peers_support_tunnel_ids(tunnels_data, nodes_data)
+    if errmsg:
+        return errmsg
+    
+    errmsg = validate_entrance_nodes_have_domain(tunnels_data, nodes_data)
+    if errmsg:
+        return errmsg
 
     return None
 

@@ -1,11 +1,11 @@
-inbound/from_clients/server.node2_to_node1.non-explicit.tunnels/home_devices:
+inbound/from_clients/server.node2_to_node1.tunnels/home_devices:
   destination_endpoints: any:3010
   protocols:
   - tcp
   source_ips:
   - 50.35.0.0/16
   - 50.36.1.80
-inbound/from_clients/server.node2_to_node1.non-explicit.tunnels/school_devices:
+inbound/from_clients/server.node2_to_node1.tunnels/school_devices:
   destination_endpoints: any:3010
   protocols:
   - tcp

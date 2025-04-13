@@ -1,3 +1,16 @@
+inbound/from_clients/server.node3_to_others.non-explicit.tunnels/home_devices:
+  destination_endpoints: any:4010
+  protocols:
+  - tcp
+  source_ips:
+  - 50.35.0.0/16
+  - 50.36.1.80
+inbound/from_clients/server.node3_to_others.non-explicit.tunnels/school_devices:
+  destination_endpoints: any:4010
+  protocols:
+  - tcp
+  source_ips:
+  - 205.251.33.0/24
 inbound/from_clients/server.to_node1_and_node2.fault-tolerant.tunnels/any:
   destination_endpoints: any:1010
   protocols:
