@@ -30,6 +30,8 @@ PACKAGE_KEY=$(echo "$PACKAGE_DIR" | sed 's|/|_|g')
 REAL_USER=${SUDO_USER:-$USER}
 REAL_HOME=$(eval echo ~$REAL_USER)
 
+LITEFLOW_SCRIPT="${SCRIPT_DIR}/liteflow.sh"
+LOCAL_OPT=""
 CONF_FILE="/usr/local/etc/liteflow.conf"
 
 log() {
@@ -49,11 +51,16 @@ for arg in "$@"; do
   case "${arg,,}" in
     --local)
       CONF_FILE="$PACKAGE_DIR/etc/liteflow.conf"
+      LOCAL_OPT="--local"
       ;;
   esac
 done
 
-update_conf_from_git() {
+reload_conf() {
+    $LITEFLOW_SCRIPT $LOCAL_OPT
+}
+
+update_conf() {
     REPO_URL="$1"
     REL_PATH="$2"
 
@@ -110,12 +117,14 @@ update_conf_from_git() {
         if ! cmp -s "$SRC_FILE" "$CONF_FILE"; then
             log "Updating $CONF_FILE with new version from repo."
             cp "$SRC_FILE" "$CONF_FILE"
+            reload_conf
         else
             log "No changes detected in config file."
         fi
     else
         log "cmp not available, overwriting $CONF_FILE without comparison."
         cp "$SRC_FILE" "$CONF_FILE"
+        reload_conf
     fi
 }
 
@@ -144,6 +153,6 @@ if [ -n "$SUDO_USER" ]; then
   export GIT_SSH_COMMAND="ssh -i $REAL_HOME/.ssh/id_rsa"
 fi
 
-update_conf_from_git "${filtered_args[0]}" "${filtered_args[1]}"
+update_conf "${filtered_args[0]}" "${filtered_args[1]}"
 
 exit 0

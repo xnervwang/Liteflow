@@ -109,6 +109,7 @@ def generate_node_configs(node_file, tunnel_file, output_dir):
         }
         
         # Process entrance rules (acting as tunnel entry points)
+        # By default, entrance rule uses explicit:true.
         for tunnel_name, tunnel in tunnels_data.items():
             has_multiple_entrances = len(tunnel.get("entrances", [])) > 1
             has_multiple_forwards = len(tunnel.get("forwards", [])) > 1
@@ -123,7 +124,7 @@ def generate_node_configs(node_file, tunnel_file, output_dir):
                                 "listen_port": int(entrance["listen_endpoint"].split(":")[1]),
                                 "protocol": "tcp"
                             }
-                            if entrance.get("explicit", False):
+                            if entrance.get("explicit", True):
                                 entrance_rule["node_id"] = node_name_to_id[forward["node"]]
                             config["entrance_rules"].append(entrance_rule)
                         if "udp_tunnel_id" in tunnel:
@@ -133,7 +134,7 @@ def generate_node_configs(node_file, tunnel_file, output_dir):
                                 "listen_port": int(entrance["listen_endpoint"].split(":")[1]),
                                 "protocol": "udp"
                             }
-                            if entrance.get("explicit", False):
+                            if entrance.get("explicit", True):
                                 entrance_rule["node_id"] = node_name_to_id[forward["node"]]
                             config["entrance_rules"].append(entrance_rule)
                         # If there are multiple forwards, this is a fault-tolerant
@@ -144,6 +145,7 @@ def generate_node_configs(node_file, tunnel_file, output_dir):
                             
             config["entrance_rules"] = sorted(config["entrance_rules"], key=lambda x: x["tunnel_id"])
             
+            # By default, forward rule uses explicit:false.
             for forward in tunnel.get("forwards", []):
                 if node_name_to_id[forward["node"]] == node_id:
                     for entrance in tunnel.get("entrances", []):

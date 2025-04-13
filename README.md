@@ -183,6 +183,11 @@ Client (192.168.1.100) config example:
 }
 ```
 
+#### `node_id` in `entrance_rule`
+⚠️ Note: If `entrance_rule` does not specify a node_id, the current node will arbitrarily select one of the connected peers to send the data to — even if that peer does not support the specified `tunnel_id`. This happens because peers do not exchange their supported `tunnel_id` lists during the connection process, so neither side is aware of the other's `tunnel_id` capabilities.
+
+**Liteflow is designed so that each process supports only a single-purpose tunnel. If multiple tunnels are needed, it is recommended to run separate Liteflow processes, each with its own configuration file.**
+
 ### Building Windows Version via Cygwin
 Liteflow supports building a Windows version using Cygwin.
 
