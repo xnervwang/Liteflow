@@ -47,7 +47,7 @@ add_dependencies(liteflow ev)
 add_dependencies(liteflow c-ares)
 add_dependencies(liteflow common)
 target_include_directories(liteflow PRIVATE ${jsonparser_INCLUDES} ${libcares_INCLUDES} ${libev_INCLUDES} ${libcommon_INCLUDES})
-target_link_libraries(liteflow c-ares ev common m)
+target_link_libraries(liteflow c-ares ev argp common m)
 
 add_executable(litedt_test
     litedt_test.c
@@ -61,7 +61,7 @@ add_executable(litedt_test
 
 add_dependencies(litedt_test common)
 target_include_directories(litedt_test PRIVATE ${jsonparser_INCLUDES} ${libcommon_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(litedt_test common m)
+target_link_libraries(litedt_test argp common m)
 
 install(TARGETS liteflow
         RUNTIME DESTINATION bin)
