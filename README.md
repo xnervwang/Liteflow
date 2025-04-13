@@ -200,6 +200,8 @@ The remaining compilation steps follow the standard procedure. After compilation
 * cygargp-0.dll
 * liteflow.exe
 
+⚠️ Note: The default DNS server configuration on Cygwin appears to be problematic. Please specify a working DNS server in the `service` section of the configuration file, for example: `"dns_server": "8.8.8.8",`.
+
 #### How to Run liteflow in the Background at Startup
 Since liteflow is a command-line program, it’s recommended to use cmder to automatically launch it when Windows starts and minimize it to the system tray.
 1. Download cmder. In `Settings...` → `General` → `Task bar`, check the option `Auto minimize to TSA`.

@@ -201,6 +201,8 @@ Cygwin必须至少安装以下Packages：
 * cygargp-0.dll
 * liteflow.exe
 
+⚠️ 注意Cygwin上的默认DNS服务器配置似乎有问题，请在配置文件的`service`一节中设置可用的DNS服务器，例如`"dns_server": "8.8.8.8",`。
+
 #### 如何开机后台运行liteflow
 由于liteflow为命令行程序，建议使用cmder，在Windows登录后自动启动liteflow，并自动最小化到系统托盘。
 1. 下载cmder，在`Settings...` -> `General` -> `Task bar`里选中`Auto minimize to TSA`。
