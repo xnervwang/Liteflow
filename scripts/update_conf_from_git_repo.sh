@@ -57,7 +57,7 @@ for arg in "$@"; do
 done
 
 reload_conf() {
-    $LITEFLOW_SCRIPT $LOCAL_OPT
+    $LITEFLOW_SCRIPT reload $LOCAL_OPT
 }
 
 update_conf() {
