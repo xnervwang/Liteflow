@@ -194,5 +194,22 @@ Cygwin必须至少安装以下Packages：
 * cmake
 * autoconf
 * libtool
+* libargp
 
-其它编译步骤与正常流程相同。编译完成后，将`cygwin1.dll`和产生的`liteflow.exe`复制到需要运行Liteflow的Windows机器上，准备好相应的配置文件并直接运行`liteflow.exe`。
+其它编译步骤与正常流程相同。编译完成后，将以下文件复制到需要运行Liteflow的Windows机器上，准备好相应的配置文件并直接运行`liteflow.exe`。
+* cygwin1.dll
+* cygargp-0.dll
+* liteflow.exe
+
+#### 如何开机后台运行liteflow
+由于liteflow为命令行程序，建议使用cmder，在Windows登录后自动启动liteflow，并自动最小化到系统托盘。
+1. 下载cmder，在`Settings...` -> `General` -> `Task bar`里选中`Auto minimize to TSA`。
+2. 创建cmder.exe的快捷方式，右键点击该快捷方式，在"目标"里添加后缀参数
+    ```bash
+    /TASK "liteflow" /x -MinTSA
+    ```
+    最终的结果看起来像例如
+    ```bash
+    C:\tools\cmder\Cmder.exe /TASK "liteflow" /x -MinTSA`
+    ```
+3. 在文件浏览器中粘贴`shell:startup`并回车，打开自动启动目录。将该快捷方式移入该目录。

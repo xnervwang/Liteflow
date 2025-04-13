@@ -193,5 +193,22 @@ Cygwin must have the following packages installed:
 * cmake
 * autoconf
 * libtool
+* libargp
 
-Other build steps are the same. After building, copy `cygwin1.dll` and the generated `liteflow.exe` to the target Windows machine. Prepare the appropriate configuration file and directly run `liteflow.exe`.
+The remaining compilation steps follow the standard procedure. After compilation, copy the following files to the Windows machine where you want to run Liteflow. Prepare the corresponding configuration files, then run liteflow.exe directly.
+* cygwin1.dll
+* cygargp-0.dll
+* liteflow.exe
+
+#### How to Run liteflow in the Background at Startup
+Since liteflow is a command-line program, it’s recommended to use cmder to automatically launch it when Windows starts and minimize it to the system tray.
+1. Download cmder. In `Settings...` → `General` → `Task bar`, check the option `Auto minimize to TSA`.
+2. Create a shortcut to Cmder.exe. Right-click the shortcut, and in the `Target` field, add the following suffix:
+    ```bash
+    /TASK "liteflow" /x -MinTSA
+    ```
+    The final result should look something like:
+    ```bash
+    "C:\tools\cmder\Cmder.exe" /TASK "liteflow" /x -MinTSA
+    ```
+3. In File Explorer, type `shell:startup` and press Enter to open the Startup folder. Move the shortcut into this folder to enable auto-start.
