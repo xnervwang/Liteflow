@@ -148,7 +148,7 @@ start() {
     # nohup bash -c "/usr/bin/env TZ=Asia/Shanghai $CMD 2>&1 | /usr/bin/logger -t ${PACKAGE_NAME}" >/dev/null 2>&1 &
     # Then the PID $! will be the parent "bash -c" PID.
     # That's why we use `disown` here as a workaround.
-    /usr/bin/env TZ=Asia/Shanghai "$CMD" >> "$LOG_FILE" 2>&1 < /dev/null &
+    /usr/bin/env TZ=Asia/Shanghai $CMD >> "$LOG_FILE" 2>&1 < /dev/null &
     disown
 
     echo $! > "$PID_FILE"
