@@ -196,7 +196,7 @@ Cygwin必须至少安装以下Packages：
 * cmake
 * autoconf
 * libtool
-* libargp
+* libargp-devel
 
 其它编译步骤与正常流程相同。编译完成后，将以下文件复制到需要运行Liteflow的Windows机器上，准备好相应的配置文件并直接运行`liteflow.exe`。
 * cygwin1.dll
