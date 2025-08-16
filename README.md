@@ -5,12 +5,12 @@ UDP tunnel & TCP/UDP Port forwarding
 
 ### Introduction
 
-Liteflow implements a simple and reliable UDP transport protocol (LiteDT), and based on this protocol, develops a TCP/UDP port forwarding tool. Both the client and the server use the same binary, with the only difference being the configuration file.
+Liteflow implements a simple and reliable UDP transport protocol (LiteDT) and has developed a TCP/UDP port forwarding tool based on this protocol. Both the client and the server use the same binary, with the only difference being the configuration file.
 
 You can use this tool to:
 
 1. Accelerate TCP transmission speed in high-latency and high-packet-loss environments, or ensure UDP packets are delivered reliably and in order.
-2. Map internal network ports to public servers through reverse connections, enabling internal ports to be actively accessed across NAT.
+2. Map internal network ports to public servers through reverse connections, enabling direct access to internal ports across NAT.
 
 ### Build and Usage Guide
 ```
@@ -38,12 +38,12 @@ cd <install_folder>
 ./bin/liteflow --version
 
 # Deploy configuration file
-# Example configs are in the etc folder, copy to etc/liteflow.conf and modify accordingly
+# Example configs are in the etc folder, copy them to etc/liteflow.conf and modify accordingly
 
 # Test whether the configuration file is valid
 ./bin/liteflow -t -c ./liteflow.conf
 
-# Run; it reads the config file named {binary_name}.conf in the current directory by default. For example, if the binary is liteflow, config file should be liteflow.conf
+# Run; it reads the config file named {binary_name}.conf in the current directory by default. For example, if the binary is liteflow, the config file should be liteflow.conf
 ./bin/liteflow
 
 # Or specify config file path
@@ -60,7 +60,7 @@ A set of control scripts is provided to make integration with crontab or systemd
 cd <install_folder>
 ./scripts/liteflow.sh start --local
 
-# Check if process is alive, restart if not
+# Check if the process is alive; restart if not
 ./scripts/liteflow.sh revive --local
 
 # Force reload configuration
@@ -198,7 +198,7 @@ Cygwin must have the following packages installed:
 * cmake
 * autoconf
 * libtool
-* libargp-devl
+* libargp-devel
 
 The remaining compilation steps follow the standard procedure. After compilation, copy the following files to the Windows machine where you want to run Liteflow. Prepare the corresponding configuration files, then run liteflow.exe directly.
 * cygwin1.dll

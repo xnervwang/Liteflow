@@ -1,23 +1,23 @@
-### 编译Docker镜像
+### Building Docker Images
 
-#### 方式1: 从远程Git仓库构建（使用默认仓库和分支）
-适用场景：直接使用作者仓库的稳定版本
+#### Method 1: Build from Remote Git Repository (Using Default Repository and Branch)
+Use case: Use the stable version directly from the author's repository
 ```
 docker build --build-arg BRANCH=master -t liteflow:master .
 ```
-- 代码来源：从 `https://github.com/zhc105/Liteflow.git` 自动下载
-- 使用分支：master（可通过BRANCH参数指定其他分支）
+- Code source: Automatically downloaded from `https://github.com/zhc105/Liteflow.git`
+- Branch used: master (can specify other branches via BRANCH parameter)
 
-#### 方式2: 从指定的远程Git仓库和分支构建
-适用场景：使用其他fork仓库或特定分支的代码
+#### Method 2: Build from Specified Remote Git Repository and Branch
+Use case: Use code from other forked repositories or specific branches
 ```
 docker build --build-arg SOURCE=https://github.com/zhc105/Liteflow.git --build-arg BRANCH=master -t liteflow:master .
 ```
-- 代码来源：从指定的Git仓库URL下载
-- 使用分支：通过BRANCH参数指定
+- Code source: Downloaded from the specified Git repository URL
+- Branch used: Specified via BRANCH parameter
 
-#### 方式3: 使用本地当前目录代码构建（不从Git下载）
-适用场景：开发测试阶段，使用本地修改过的代码（包括未提交的更改）
+#### Method 3: Build Using Local Current Directory Code (No Git Download)
+Use case: Development and testing phase, using locally modified code (including uncommitted changes)
 ```
 # option 1
 docker build --build-arg SOURCE=local -t liteflow:local .
@@ -26,14 +26,14 @@ docker build --build-arg SOURCE=. -t liteflow:local .
 # option 3
 docker build --build-arg SOURCE=./ -t liteflow:local .
 ```
-- 代码来源：直接使用当前目录的代码文件
-- 无需网络连接，可以包含本地未提交的修改
+- Code source: Use code files directly from the current directory
+- No network connection required; can include uncommitted local modifications
 
-### 启动容器
+### Starting Containers
 
-#### 方式1: 使用环境变量动态生成配置
+#### Method 1: Dynamic Configuration Generation Using Environment Variables
 
-脚本示例：
+Script example:
 ```bash
 #!/bin/bash
 
@@ -43,9 +43,9 @@ EOM
 
 forward_rules=$(cat <<- EOM
     {
-        "tunnel_id": 100,                   // Tunnel ID和服务端entrance_rules对应
-        "destination_addr": "127.0.0.1",    // 为此Tunnel指定转发目标地址
-        "destination_port": 1501            // 指定转发目标端口
+        "tunnel_id": 100,                   // Tunnel ID corresponds to server-side entrance_rules
+        "destination_addr": "127.0.0.1",    // Specify forwarding target address for this tunnel
+        "destination_port": 1501            // Specify forwarding target port
     },
 EOM
 )
@@ -66,11 +66,11 @@ docker run --network host --name liteflow-main -d --restart=always \
     liteflow:master
 ```
 
-#### 方式2: 使用预置配置文件
+#### Method 2: Using Pre-configured Configuration File
 
-**步骤1**: 准备配置文件
+**Step 1**: Prepare configuration file
 ```bash
-# 创建配置文件，可以参考 examples/ 目录下的示例
+# Create configuration file, you can refer to examples in the examples/ directory
 cat > /host/path/to/liteflow.conf << 'EOF'
 {
     "service": {
@@ -98,7 +98,7 @@ cat > /host/path/to/liteflow.conf << 'EOF'
 EOF
 ```
 
-**步骤2**: 启动容器并挂载配置文件
+**Step 2**: Start container and mount configuration file
 ```bash
 docker run --network host --name liteflow-main -d --restart=always \
     -v /host/path/to/liteflow.conf:/app/config/liteflow.conf \
@@ -106,6 +106,6 @@ docker run --network host --name liteflow-main -d --restart=always \
     liteflow:master
 ```
 
-**注意事项**：
-- 容器会检查配置文件是否存在，不存在则启动失败
-- 使用预置配置文件时，所有环境变量配置参数都会被忽略
+**Important Notes**:
+- The container will check if the configuration file exists, and will fail to start if it doesn't exist
+- When using a pre-configured file, all environment variable configuration parameters will be ignored

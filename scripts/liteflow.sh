@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# This script is used for crontab and manual operation.
+# This script is used for crontab and manual operations.
 # There are two modes: local, global (by default):
 #   local: Start liteflow from a local folder and all configuration/log/pid
 #       files are placed in local folder. This mode is typically used when you
 #       have multiple liteflow copies on the same machine, which have different
 #       binaries or configurations.
-#   global: This is the default mode. If you have installed liteflow in global
-#       position, use this mode.
+#   global: This is the default mode. If you have installed liteflow in a global
+#       location, use this mode.
 
-# **NOTE** bash will not exit even if any command exits with non-zero.
+# **NOTE** bash will not exit even if any command exits with a non-zero exit code.
 #           the script will take care of the workflow.
 set +e
 

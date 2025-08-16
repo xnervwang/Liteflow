@@ -1,47 +1,47 @@
 # liteflow-compose
-一个用于更方便地管理和生成集群内多个liteflow实例配置文件的工具。通过YAML定义集群内所有的node实例，和tunnel隧道信息，本工具可以自动化生成各个node的JSON配置文件，避免手工维护多个实例的配置文件，降低人为出错概率。
+A tool for convenient management and generation of configuration files for multiple liteflow instances within a cluster. By defining node instances and tunnel information through YAML files, this tool automatically generates JSON configuration files for each node, eliminating the need for manual maintenance and reducing the risk of human errors.
 
-## 使用说明
-首先准备好两个YAML文件，一个文件用来定义当前集群内的所有node实例和信息，另一个文件用来定义所有的tunnel隧道信息。具体的文件格式请参考example_yamls目录下给出的示例。
+## Usage Instructions
+First, prepare two YAML files: one file to define all node instances and information in the current cluster, and another file to define all tunnel information. For specific file formats, please refer to the examples provided in the example-regular directory.
 
-然后运行
+Then run:
 ```
 ./liteflow-compose.py -n <nodes.yaml file path> -t <nodes.yaml file path> <output_dir>
 ```
 
-在指定的`<output_dir>`输出目录中，可以找到所有实例的配置文件。
+In the specified `<output_dir>` output directory, you can find configuration files for all instances.
 
-运行完成后，屏幕后将会输出连接到每个实例的其它实例及端口信息，以及实例监听的所有端口，便于配置防火墙规则。
+Upon completion, the tool will display information about other instances and ports connected to each instance, as well as all ports that instances listen on, to facilitate firewall rule configuration.
 
-本工具已附带一个example，请运行
+This tool includes an example; please run:
 ```
 ./liteflow-compose.py -n example-regular/nodes.yaml -t example-regular/tunnels.yaml example-regular/output
 ```
 
-本工具会检查提供的YAML的格式和内容是否符合要求。
+This tool will check whether the format and content of the provided YAML meet the requirements.
 
-## 生成拓扑图
-本工具可以生成Graphviz的dot文件和图形（支持png, svg, pdf, jpg, jpeg, bmp, gif, tiff这些格式）。运行
+## Generating Topology Diagrams
+This tool can generate Graphviz dot files and graphics (supports png, svg, pdf, jpg, jpeg, bmp, gif, tiff formats). Run:
 ```
 ./draw-graphviz.py -n <nodes.yaml file path> -t <nodes.yaml file path> -d <generated .dot file path> -i <generated image file path>
 ```
 
-例如，提供的example会生这样的图形：
+For example, the provided example will generate graphics like this:
 ```
 ./draw-graphviz.py -n example-regular/nodes.yaml -t example-regular/tunnels.yaml -d example-regular/output/liteflow.dot -i example-regular/output/liteflow.png
 ```
 ![liteflow.png](./example-regular/output/liteflow.png)
 
-## 生成防火墙规则
-用于生成所有liteflow节点的inbound和outbound防火墙规则，以及clients的outbound防火墙规则。所有规则输出为YAML文件，用作设置防火墙的参考。每一个liteflow节点或每一个client将会生成一个单独的YAML文件。
+## Generating Firewall Rules
+Used to generate inbound and outbound firewall rules for all liteflow nodes, as well as outbound firewall rules for clients. All rules are output as YAML files for reference when setting up firewalls. Each liteflow node or each client will generate a separate YAML file.
 
-本工具已附带一个example，请运行
+This tool includes an example; please run:
 ```
 ./generate-firewall-rules.py -n example-firewall-rules/nodes.yaml -t example-firewall-rules/tunnels.yaml -c example-firewall-rules/clients.yaml example-firewall-rules/output
 ```
 
-## 高级进阶：容灾备份
-在liteflow的设置中，`entrance_rule`可以显式指定tunnel另一端的节点的`node_id`，则此规则仅用于转发到该指定下一级节点。例如：
+## Advanced: Disaster Recovery Backup
+In liteflow settings, `entrance_rule` can explicitly specify the `node_id` of the node at the other end of the tunnel, then this rule will only forward to that specified next-level node. For example:
 ```json
 {
     "tunnel_id": 1011,
@@ -52,16 +52,16 @@
 }
 ```
 
-如果`entrance_rule`不指定下一级的`node_id`，则liteflow只会将该tunnel的数据转到其中任意一个peer。如果此peer之后断开了连接，则liteflow会选择转发给下一个peer。这是一种容灾备份，避免单个forward节点的故障导致一个tunnel完全不可用。请注意，这不能用于实现负载均衡。
+If `entrance_rule` does not specify the next-level `node_id`, liteflow will only forward the tunnel data to any one of its peers. If this peer later disconnects, liteflow will choose to forward to the next peer. This is a disaster recovery backup to prevent a single forward node failure from making a tunnel completely unavailable. Please note that this cannot be used to implement load balancing.
 
-同样地，`forward_rule`也有类似的行为。如果在`forward_rule`中指定了`node_id`，就只能接受来自该node的用户连接。否则就可以接受来自任意peer的用户连接。这是为了避免单个`entrance`节点的故障导致一个tunnel完全不可用。
+Similarly, `forward_rule` has similar behavior. If `node_id` is specified in `forward_rule`, it can only accept user connections from that node. Otherwise, it can accept user connections from any peer. This is to prevent a single `entrance` node failure from making a tunnel completely unavailable.
 
-> ⚠️ 请注意，如果`entrance_rule`不指定`node_id`，则本节点会从所有连接的peers中任意选择一个发送，即使该peer并不支持该`tunnel_id`。这是因为两个peer在连接时并不会交换`tunnel_id`列表，双方并不知晓对方所支持的`tunnel_id`信息。
+> ⚠️ Please note that if `entrance_rule` does not specify `node_id`, this node will arbitrarily choose one from all connected peers to send to, even if that peer does not support that `tunnel_id`. This is because the two peers do not exchange `tunnel_id` lists when connecting, and neither side knows the `tunnel_id` information supported by the other.
 >
-> **因此，Liteflow 被设计为每个进程仅支持一个用途单一的隧道。若需使用多个隧道，建议为每个隧道分别启动独立的 Liteflow 进程，并配以各自的配置文件。**
+> **Therefore, Liteflow is designed so that each process supports only a single-purpose tunnel. If multiple tunnels are needed, it is recommended to start separate Liteflow processes for each tunnel, each with its own configuration file.**
 
-在liteflow-compose的设置中，这可以通过在一个规则下设置多个`entrance`或`forward`来实现，请参考example。
+In liteflow-compose settings, this can be achieved by setting multiple `entrance` or `forward` under one rule, please refer to the example.
 
-同一个规则下，如果多于一个`forward`，则其`entrance`可以设置`explicit`为`false`（默认为`true`），生成的`entrance_rule`中就不会设置`forward`节点的`node_id`。
+Under the same rule, if there are more than one `forward`, then its `entrance` can set `explicit` to `false` (default is `true`), and the generated `entrance_rule` will not set the `node_id` of the `forward` node.
 
-相对应的时，如果只有单个`entrance`，则其`forward`可以设置`explict`为`true`（默认为`false`)，生成的`forward_rule`中会严格指定`entrance`节点的`node_id`。
+Correspondingly, if there is only a single `entrance`, then its `forward` can set `explicit` to `true` (default is `false`), and the generated `forward_rule` will strictly specify the `node_id` of the `entrance` node.

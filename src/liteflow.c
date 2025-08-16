@@ -539,7 +539,7 @@ resolve_outbound_peer(peer_info_t *peer)
     int af = get_addr_family(peer->address);
 
     if (af == AF_INET) {
-        // peer->address is a IPv4 address
+        // peer->address is an IPv4 address
         struct sockaddr_in *addr = (struct sockaddr_in *)&storage;
         socklen_t addr_len = sizeof(struct sockaddr_in);
         addr->sin_family = AF_INET;
@@ -548,7 +548,7 @@ resolve_outbound_peer(peer_info_t *peer)
 
         peer_start(peer, (struct sockaddr *)addr, addr_len);
     } else if (af == AF_INET6) {
-        // peer->address is a IPv6 address
+        // peer->address is an IPv6 address
         struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&storage;
         socklen_t addr_len = sizeof(struct sockaddr_in6);
         addr->sin6_family = AF_INET6;
