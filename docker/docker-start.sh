@@ -64,6 +64,12 @@ if [ -z "$confpath" ]; then
     # Generate config file for liteflow node
     generate_config
 else
+    # Check if the specified config file exists
+    if [ ! -f "$confpath" ]; then
+        echo "Error: Config file '$confpath' does not exist!"
+        echo "Please make sure the file is mounted and the path is correct."
+        exit 1
+    fi
     # override confpath
     gen_confpath=$confpath
 fi
