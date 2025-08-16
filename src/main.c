@@ -47,6 +47,8 @@ const char doc[] = "UDP tunnel & TCP/UDP Port forwarding";
 static struct argp_option options[] = {
     {"config", 'c', "CONFIG_FILE", 0,
         "Specify the config file path. If not specified, the default value is <exe_name>.conf.", 0},
+    {"version", 'v', NULL, 0,
+        "Show the version of the executable.", 0},
     {"test-config", 't', NULL, 0,
         "Test the config file and exit.", 0},
     {0}
@@ -62,6 +64,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         case 'c':
             strncpy(config_name, arg, sizeof(config_name) - 1);
             break;
+        case 'v':
+            fprintf(stdout, "Liteflow %s\n", argp_program_version);
+            exit(0);
         case 't':
             test_mode = true;
             break;

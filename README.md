@@ -181,6 +181,11 @@ Client (192.168.1.100) config example:
 }
 ```
 
+#### `node_id` in `entrance_rule`
+⚠️ Note: If `entrance_rule` does not specify a node_id, the current node will arbitrarily select one of the connected peers to send the data to — even if that peer does not support the specified `tunnel_id`. This happens because peers do not exchange their supported `tunnel_id` lists during the connection process, so neither side is aware of the other's `tunnel_id` capabilities.
+
+**Liteflow is designed so that each process supports only a single-purpose tunnel. If multiple tunnels are needed, it is recommended to run separate Liteflow processes, each with its own configuration file.**
+
 ### Building Windows Version via Cygwin
 Liteflow supports building a Windows version using Cygwin.
 
@@ -193,5 +198,24 @@ Cygwin must have the following packages installed:
 * cmake
 * autoconf
 * libtool
+* libargp-devl
 
-Other build steps are the same. After building, copy `cygwin1.dll` and the generated `liteflow.exe` to the target Windows machine. Prepare the appropriate configuration file and directly run `liteflow.exe`.
+The remaining compilation steps follow the standard procedure. After compilation, copy the following files to the Windows machine where you want to run Liteflow. Prepare the corresponding configuration files, then run liteflow.exe directly.
+* cygwin1.dll
+* cygargp-0.dll
+* liteflow.exe
+
+⚠️ Note: The default DNS server configuration on Cygwin appears to be problematic. Please specify a working DNS server in the `service` section of the configuration file, for example: `"dns_server": "8.8.8.8",`.
+
+#### How to Run liteflow in the Background at Startup
+Since liteflow is a command-line program, it’s recommended to use cmder to automatically launch it when Windows starts and minimize it to the system tray.
+1. Download cmder. In `Settings...` → `General` → `Task bar`, check the option `Auto minimize to TSA`.
+2. Create a shortcut to Cmder.exe. Right-click the shortcut, and in the `Target` field, add the following suffix:
+    ```bash
+    /TASK "liteflow" /x -MinTSA
+    ```
+    The final result should look something like:
+    ```bash
+    "C:\tools\cmder\Cmder.exe" /TASK "liteflow" /x -MinTSA
+    ```
+3. In File Explorer, type `shell:startup` and press Enter to open the Startup folder. Move the shortcut into this folder to enable auto-start.

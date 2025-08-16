@@ -77,7 +77,7 @@ cd <install_folder>
 ./scripts/liteflow.sh status --local
 ```
 
-####示例1： 服务端1.2.3.4开放TCP 1501端口，映射到客户端192.168.1.100:1501
+#### 示例1： 服务端1.2.3.4开放TCP 1501端口，映射到客户端192.168.1.100:1501
 
 部署方式：
 ```
@@ -130,7 +130,7 @@ cd <install_folder>
 }
 ```
 
-####示例2： 客户端192.168.1.100开放TCP 1501端口，通过反向连接映射到服务端1.2.3.4:1501
+#### 示例2： 客户端192.168.1.100开放TCP 1501端口，通过反向连接映射到服务端1.2.3.4:1501
 
 部署方式：
 ```
@@ -182,6 +182,11 @@ cd <install_folder>
 }
 ```
 
+#### `entrance_rule`的`node_id`
+⚠️ 请注意，如果`entrance_rule`不指定`node_id`，则本节点会从所有连接的peers中任意选择一个发送，即使该peer并不支持该`tunnel_id`。两个peer在连接时并不会交换`tunnel_id`列表，双方并不知晓对方所支持的`tunnel_id`信息。
+
+**因此，Liteflow 被设计为每个进程仅支持一个用途单一的隧道。若需使用多个隧道，建议为每个隧道分别启动独立的 Liteflow 进程，并配以各自的配置文件。**
+
 ### Cygwin编译Windows版本
 Liteflow支持通过Cygwin编译提供Windows可用版本。
 
@@ -194,5 +199,24 @@ Cygwin必须至少安装以下Packages：
 * cmake
 * autoconf
 * libtool
+* libargp-devel
 
-其它编译步骤与正常流程相同。编译完成后，将`cygwin1.dll`和产生的`liteflow.exe`复制到需要运行Liteflow的Windows机器上，准备好相应的配置文件并直接运行`liteflow.exe`。
+其它编译步骤与正常流程相同。编译完成后，将以下文件复制到需要运行Liteflow的Windows机器上，准备好相应的配置文件并直接运行`liteflow.exe`。
+* cygwin1.dll
+* cygargp-0.dll
+* liteflow.exe
+
+⚠️ 注意Cygwin上的默认DNS服务器配置似乎有问题，请在配置文件的`service`一节中设置可用的DNS服务器，例如`"dns_server": "8.8.8.8",`。
+
+#### 如何开机后台运行liteflow
+由于liteflow为命令行程序，建议使用cmder，在Windows登录后自动启动liteflow，并自动最小化到系统托盘。
+1. 下载cmder，在`Settings...` -> `General` -> `Task bar`里选中`Auto minimize to TSA`。
+2. 创建cmder.exe的快捷方式，右键点击该快捷方式，在"目标"里添加后缀参数
+    ```bash
+    /TASK "liteflow" /x -MinTSA
+    ```
+    最终的结果看起来像例如
+    ```bash
+    C:\tools\cmder\Cmder.exe /TASK "liteflow" /x -MinTSA`
+    ```
+3. 在文件浏览器中粘贴`shell:startup`并回车，打开自动启动目录。将该快捷方式移入该目录。

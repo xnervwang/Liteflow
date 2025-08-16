@@ -17,10 +17,12 @@ SET(GITREV_TMP ${CMAKE_CURRENT_BINARY_DIR}/gen/${GITREV_BARE_TMP})
 ADD_CUSTOM_COMMAND(
   OUTPUT ${GITREV_TMP} ${GITREV_FILE}
   COMMAND ${CMAKE_COMMAND} -E echo_append "#define GIT_BRANCH_STR " > ${GITREV_TMP}
-  COMMAND ${GIT_EXECUTABLE} describe --tags --dirty=-unclean >> ${GITREV_TMP}
+  # If no tag in current repo, use short hash instead. Otherwise build would fail in a new
+  # cloned repo which has not cloned any tag.
+  COMMAND sh -c "${GIT_EXECUTABLE} describe --tags --dirty=-unclean 2>/dev/null || ${GIT_EXECUTABLE} rev-parse --short HEAD" >> ${GITREV_TMP}
   COMMAND ${CMAKE_COMMAND} -E echo "#define STR(S) #S" >> ${GITREV_TMP}
   COMMAND ${CMAKE_COMMAND} -E echo "#define XSTR(S) STR(S)" >> ${GITREV_TMP}
-  COMMAND ${CMAKE_COMMAND} -E echo "const char* liteflow_version = \"liteflow.git/\" XSTR(GIT_BRANCH_STR); " >> ${GITREV_TMP}
+  COMMAND ${CMAKE_COMMAND} -E echo "const char* liteflow_version = \"liteflow.git/\" XSTR(GIT_BRANCH_STR);" >> ${GITREV_TMP}
   COMMAND ${CMAKE_COMMAND} -E copy_if_different ${GITREV_TMP} ${GITREV_FILE}
   COMMAND ${CMAKE_COMMAND} -E remove ${GITREV_TMP}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -46,7 +48,16 @@ add_dependencies(liteflow ev)
 add_dependencies(liteflow c-ares)
 add_dependencies(liteflow common)
 target_include_directories(liteflow PRIVATE ${jsonparser_INCLUDES} ${libcares_INCLUDES} ${libev_INCLUDES} ${libcommon_INCLUDES})
-target_link_libraries(liteflow c-ares ev common m)
+
+# Detect if building on Cygwin
+if(CYGWIN)
+    message(STATUS "Detected Cygwin: linking with extra libraries")
+    set(CYGWIN_EXTRA_LIB argp)
+else()
+    set(CYGWIN_EXTRA_LIB "")
+endif()
+
+target_link_libraries(liteflow c-ares ev ${CYGWIN_EXTRA_LIB} common m)
 
 add_executable(litedt_test
     litedt_test.c
@@ -60,7 +71,7 @@ add_executable(litedt_test
 
 add_dependencies(litedt_test common)
 target_include_directories(litedt_test PRIVATE ${jsonparser_INCLUDES} ${libcommon_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(litedt_test common m)
+target_link_libraries(litedt_test ${CYGWIN_EXTRA_LIB} common m)
 
 install(TARGETS liteflow
         RUNTIME DESTINATION bin)

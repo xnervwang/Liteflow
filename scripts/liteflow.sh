@@ -10,7 +10,7 @@
 #       position, use this mode.
 
 # **NOTE** bash will not exit even if any command exits with non-zero.
-#           the script will take care of the liteflow process.
+#           the script will take care of the workflow.
 set +e
 
 PACKAGE_NAME=liteflow
@@ -101,15 +101,7 @@ start() {
     ulimit -n 65536
 
     if [ ! -d /etc/logrotate.d ]; then
-        log -r "Logrotate directory not found, using logger output. Please install logrotate if needed."
-
-        # Don't use nohup directly since it will print "nohup: redirecting stderr to stdout".
-        # But if we use:
-        # nohup bash -c "/usr/bin/env TZ=Asia/Shanghai $CMD 2>&1 | /usr/bin/logger -t ${PACKAGE_NAME}" >/dev/null 2>&1 &
-        # Then the PID $! will be the parent "bash -c" PID.
-        # That's why we use `disown` here.
-        /usr/bin/env TZ=Asia/Shanghai $CMD 2>&1 | /usr/bin/logger -t ${PACKAGE_NAME} &
-        disown
+        log -r "Logrotate directory not found, writing to single log file directly. Please install logrotate if needed."
     else
         ROTATE_CONFIG="$LOG_FILE {
     daily
@@ -149,10 +141,15 @@ start() {
             fi
             log -r "Created new logrotate config at $ROTATE_FILE."
         fi
-
-        /usr/bin/env TZ=Asia/Shanghai $CMD 2>&1 >> $LOG_FILE &
-        disown
     fi
+
+    # Don't use nohup directly since it will print "nohup: redirecting stderr to stdout".
+    # But if we use:
+    # nohup bash -c "/usr/bin/env TZ=Asia/Shanghai $CMD 2>&1 | /usr/bin/logger -t ${PACKAGE_NAME}" >/dev/null 2>&1 &
+    # Then the PID $! will be the parent "bash -c" PID.
+    # That's why we use `disown` here as a workaround.
+    /usr/bin/env TZ=Asia/Shanghai $CMD >> "$LOG_FILE" 2>&1 < /dev/null &
+    disown
 
     echo $! > "$PID_FILE"
     log "${PACKAGE_NAME} started (PID $(cat $PID_FILE))."
