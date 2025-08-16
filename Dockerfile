@@ -1,6 +1,6 @@
 # Stage 1
-FROM alpine:3.15 as builder
-RUN apk add --no-cache git build-base libev-dev cmake && \
+FROM alpine:3.15 AS builder
+RUN apk add --no-cache git build-base libev-dev cmake argp-standalone && \
     mkdir -p /source/build
 ARG SOURCE=https://github.com/zhc105/Liteflow.git
 ARG BRANCH=master
@@ -54,12 +54,12 @@ ENV tag="main" \
     forward_rules=""
 
 RUN mkdir -p /app/bin && \
-    mkdir -p /app/config
+    mkdir -p /app/etc
 
 WORKDIR /app
 
 COPY --from=builder /source/Liteflow/build/src/liteflow /app/bin
-COPY docker/liteflow.conf.template /app/config
+COPY docker/liteflow.conf.template /app/etc
 COPY docker/docker-start.sh /app
 
 RUN chmod +x /app/docker-start.sh

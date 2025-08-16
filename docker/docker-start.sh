@@ -5,9 +5,9 @@
 declare -g gen_confpath
 
 if [[ -z "${tag}" ]]; then
-    gen_confpath="./config/liteflow.conf"
+    gen_confpath="./etc/liteflow.conf"
 else
-    gen_confpath="./config/liteflow-${tag}.conf"
+    gen_confpath="./etc/liteflow-${tag}.conf"
 fi
 
 escape_string() {
@@ -36,7 +36,7 @@ emplace_variable() {
 }
 
 generate_config() {
-    mv ./config/liteflow.conf.template $gen_confpath
+    mv ./etc/liteflow.conf.template $gen_confpath
 
     escape_string "$connect_peers"; connect_peers="$ret"
     escape_string "$entrance_rules"; entrance_rules="$ret"
@@ -75,4 +75,6 @@ else
 fi
 
 # Launch liteflow node
-./bin/liteflow -c $gen_confpath
+# liteflow will be the pid=1 process after exec, which allows liteflow to handle
+# signals from other sidecar containers.
+exec ./bin/liteflow -c $gen_confpath
