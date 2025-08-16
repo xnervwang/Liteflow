@@ -1,4 +1,4 @@
-# conf-compose
+# liteflow-compose
 一个用于更方便地管理和生成集群内多个liteflow实例配置文件的工具。通过YAML定义集群内所有的node实例，和tunnel隧道信息，本工具可以自动化生成各个node的JSON配置文件，避免手工维护多个实例的配置文件，降低人为出错概率。
 
 ## 使用说明
@@ -6,7 +6,7 @@
 
 然后运行
 ```
-./conf-compose.py -n <nodes.yaml file path> -t <nodes.yaml file path> <output_dir>
+./liteflow-compose.py -n <nodes.yaml file path> -t <nodes.yaml file path> <output_dir>
 ```
 
 在指定的`<output_dir>`输出目录中，可以找到所有实例的配置文件。
@@ -15,7 +15,7 @@
 
 本工具已附带一个example，请运行
 ```
-./conf-compose.py -n example-regular/nodes.yaml -t example-regular/tunnels.yaml example-regular/output
+./liteflow-compose.py -n example-regular/nodes.yaml -t example-regular/tunnels.yaml example-regular/output
 ```
 
 本工具会检查提供的YAML的格式和内容是否符合要求。
@@ -60,7 +60,7 @@
 >
 > **因此，Liteflow 被设计为每个进程仅支持一个用途单一的隧道。若需使用多个隧道，建议为每个隧道分别启动独立的 Liteflow 进程，并配以各自的配置文件。**
 
-在conf-compose的设置中，这可以通过在一个规则下设置多个`entrance`或`forward`来实现，请参考example。
+在liteflow-compose的设置中，这可以通过在一个规则下设置多个`entrance`或`forward`来实现，请参考example。
 
 同一个规则下，如果多于一个`forward`，则其`entrance`可以设置`explicit`为`false`（默认为`true`），生成的`entrance_rule`中就不会设置`forward`节点的`node_id`。
 

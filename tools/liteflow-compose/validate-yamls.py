@@ -324,7 +324,7 @@ def validate_clients_yaml(clients_data):
 def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    parser = argparse.ArgumentParser(description="conf-compose YAML format validation tool")
+    parser = argparse.ArgumentParser(description="liteflow-compose YAML format validation tool")
 
     # Allow both positional and optional named arguments
     parser.add_argument("-n", "--nodes_yaml_file", type=str,
