@@ -49,15 +49,17 @@ add_dependencies(liteflow c-ares)
 add_dependencies(liteflow common)
 target_include_directories(liteflow PRIVATE ${jsonparser_INCLUDES} ${libcares_INCLUDES} ${libev_INCLUDES} ${libcommon_INCLUDES})
 
+find_library(ARGP_LIBRARY NAMES argp REQUIRED)
+
 # Detect if building on Cygwin
 if(CYGWIN)
     message(STATUS "Detected Cygwin: linking with extra libraries")
-    set(CYGWIN_EXTRA_LIB argp)
+    set(CYGWIN_EXTRA_LIB ${ARGP_LIBRARY})
 else()
     set(CYGWIN_EXTRA_LIB "")
 endif()
 
-target_link_libraries(liteflow c-ares ev ${CYGWIN_EXTRA_LIB} common m argp)
+target_link_libraries(liteflow c-ares ev ${CYGWIN_EXTRA_LIB} common m ${ARGP_LIBRARY})
 
 add_executable(litedt_test
     litedt_test.c
@@ -71,7 +73,7 @@ add_executable(litedt_test
 
 add_dependencies(litedt_test common)
 target_include_directories(litedt_test PRIVATE ${jsonparser_INCLUDES} ${libcommon_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(litedt_test ${CYGWIN_EXTRA_LIB} common m argp)
+target_link_libraries(litedt_test ${CYGWIN_EXTRA_LIB} common m ${ARGP_LIBRARY})
 
 install(TARGETS liteflow
         RUNTIME DESTINATION bin)
